@@ -6,6 +6,7 @@ public class PlayerMovement : MonoBehaviour
    [SerializeField]private float speed;
    [SerializeField]private float jumpspeed;
    private Vector3 originalScale;
+   private Animator 
 
    private void Awake() // this method will be called everytime the script loads
    {
