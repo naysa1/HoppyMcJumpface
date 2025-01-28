@@ -2,54 +2,64 @@ using UnityEngine;
 
 public class PlayerMovement : MonoBehaviour
 {
-   private Rigidbody2D body; // sets up a reference to the rigidbody in Unity and will be refered to as body
-   [SerializeField]private float speed;
-   [SerializeField]private float jumpspeed;
-   private Vector3 originalScale;
-   private Animator anim;
-   private bool Grounded;
+    private Rigidbody2D body;
+    [SerializeField] private float speed; // Speed of horizontal movement
+    [SerializeField] private float maxJumpValue = 20f; // Maximum jump force
+    [SerializeField] private float jumpChargeRate = 40f; // Rate at which jump force increases
+    private float jumpCharge = 0f; // Current jump charge
+    private Vector3 originalScale;
+    private Animator anim;
+    [SerializeField] private bool Grounded;
+    private bool isChargingJump = false;
 
-   private void Awake() // this method will be called everytime the script loads
-   {
-        // grab references for rigidbody & animator from object
-        body = GetComponent<Rigidbody2D>(); // a way to access rigidbody2D
+    private void Awake()
+    {
+        body = GetComponent<Rigidbody2D>();
         originalScale = transform.localScale;
         anim = GetComponent<Animator>();
-   }
+    }
 
-   private void Update()
-   {
+    private void Update()
+    {
         float horizontalInput = Input.GetAxis("Horizontal");
-        body.linearVelocity = new Vector2(Input.GetAxis("Horizontal") * speed, body.linearVelocity.y);
-       
-        //flip player horizontally
-        if(horizontalInput>0.01f)
-            {
-                transform.localScale = new Vector3(originalScale.x, originalScale.y, originalScale.z);
-            }
-        if(horizontalInput<-0.01f)
-            {
-                transform.localScale = new Vector3(-originalScale.x, originalScale.y, originalScale.z);
-            }
+        body.linearVelocity = new Vector2(horizontalInput * speed, body.linearVelocity.y);
 
-        if (Grounded && (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.UpArrow)))
-            {
-                body.linearVelocity = new Vector2(body.linearVelocity.x, jumpspeed);
-            }
-        
-        // set animator parameters
-        anim.SetBool("Run", horizontalInput != 0); // if input = 0 and if 0 != 0 then thats FALSE so, no input means player not running
+        // Flip sprite based on movement direction
+        if (horizontalInput > 0.01f)
+        {
+            transform.localScale = new Vector3(originalScale.x, originalScale.y, originalScale.z);
+        }
+        if (horizontalInput < -0.01f)
+        {
+            transform.localScale = new Vector3(-originalScale.x, originalScale.y, originalScale.z);
+        }
+
+        // Start charging jump
+        if (Grounded && (Input.GetKey(KeyCode.Space) || Input.GetKey(KeyCode.UpArrow)))
+        {
+            isChargingJump = true;
+            jumpCharge += jumpChargeRate * Time.deltaTime; // Increase jump charge
+            jumpCharge = Mathf.Clamp(jumpCharge, 0f, maxJumpValue); // Limit to maxJumpValue
+        }
+
+        // Release jump
+        if (isChargingJump && (Input.GetKeyUp(KeyCode.Space) || Input.GetKeyUp(KeyCode.UpArrow)))
+        {
+            body.linearVelocity = new Vector2(body.linearVelocity.x, jumpCharge); // Apply jump force
+            jumpCharge = 0f; // Reset jump charge
+            isChargingJump = false;
+            Grounded = false; // Frog is airborne
+        }
+
+        // Update animator parameters
+        anim.SetBool("Run", horizontalInput != 0);
         anim.SetBool("Grounded", Grounded);
-   }
+    }
 
-
-   private void Jump() {
-        body.linearVelocity = new Vector2(body.linearVelocity.x, speed);
-        Grounded = false;
-   }
-
-    private void OnCollisionEnter2D(Collision2D collision) {
-        if(collision.gameObject.tag == "Ground") {
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        if (collision.gameObject.CompareTag("Ground"))
+        {
             Grounded = true;
         }
     }
