@@ -6,7 +6,7 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private float speed; // Speed of horizontal movement
     [SerializeField] private float maxJumpValue = 20f; // Maximum jump force
     [SerializeField] private float jumpChargeRate = 40f; // Rate at which jump force increases
-    private float jumpCharge = 0f; // Current jump charge
+    private float jumpCharge = 5f; // Current jump charge
     private Vector3 originalScale;
     private Animator anim;
     [SerializeField] private bool Grounded;
@@ -21,8 +21,8 @@ public class PlayerMovement : MonoBehaviour
 
     private void Update()
     {
-        float horizontalInput = Input.GetAxis("Horizontal");
-        body.linearVelocity = new Vector2(horizontalInput * speed, body.linearVelocity.y);
+        float horizontalInput = Input.GetAxis("Horizontal"); // saving user input 
+        body.linearVelocity = new Vector2(horizontalInput * speed, body.linearVelocity.y); // moving user horizontally 
 
         // Flip sprite based on movement direction
         if (horizontalInput > 0.01f)
@@ -35,7 +35,7 @@ public class PlayerMovement : MonoBehaviour
         }
 
         // Start charging jump
-        if (Grounded && (Input.GetKey(KeyCode.Space) || Input.GetKey(KeyCode.UpArrow)))
+        if (Grounded && (Input.GetKey(KeyCode.Space) || Input.GetKey(KeyCode.UpArrow))) 
         {
             isChargingJump = true;
             jumpCharge += jumpChargeRate * Time.deltaTime; // Increase jump charge
