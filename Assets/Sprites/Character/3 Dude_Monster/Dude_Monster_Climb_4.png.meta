@@ -222,7 +222,11 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      Dude_Monster_Climb_4_0: -6515219773401165674
+      Dude_Monster_Climb_4_1: -8185893216420345336
+      Dude_Monster_Climb_4_2: -18153868545361911
+      Dude_Monster_Climb_4_3: 396634918258255795
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

@@ -272,7 +272,13 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      Dude_Monster_Walk_6_0: 643946939491699919
+      Dude_Monster_Walk_6_1: -4921892800743867558
+      Dude_Monster_Walk_6_2: -6194927918925737603
+      Dude_Monster_Walk_6_3: 1349925577193000161
+      Dude_Monster_Walk_6_4: -1474390804826510200
+      Dude_Monster_Walk_6_5: -7564806022734763199
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

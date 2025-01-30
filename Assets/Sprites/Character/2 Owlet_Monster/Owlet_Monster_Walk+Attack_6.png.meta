@@ -272,7 +272,13 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      Owlet_Monster_Walk+Attack_6_0: 6152151165660259215
+      Owlet_Monster_Walk+Attack_6_1: -3416056436996313184
+      Owlet_Monster_Walk+Attack_6_2: -5984066264696842118
+      Owlet_Monster_Walk+Attack_6_3: -860534046047910769
+      Owlet_Monster_Walk+Attack_6_4: -2733712867670747107
+      Owlet_Monster_Walk+Attack_6_5: 2972616556907592008
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

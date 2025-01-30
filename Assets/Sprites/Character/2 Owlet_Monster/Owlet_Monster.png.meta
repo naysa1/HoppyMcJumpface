@@ -147,7 +147,8 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      Owlet_Monster_0: -8704524280614070974
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

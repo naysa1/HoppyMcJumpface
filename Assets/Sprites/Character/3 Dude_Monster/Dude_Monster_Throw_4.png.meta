@@ -222,7 +222,11 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      Dude_Monster_Throw_4_0: -314225636306207136
+      Dude_Monster_Throw_4_1: 6208334527300023436
+      Dude_Monster_Throw_4_2: -3037748654745408057
+      Dude_Monster_Throw_4_3: -1383139184236814737
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

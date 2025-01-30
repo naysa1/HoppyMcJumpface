@@ -222,7 +222,11 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      Dude_Monster_Idle_4_0: 8212814697626224067
+      Dude_Monster_Idle_4_1: 9101964261480447885
+      Dude_Monster_Idle_4_2: -6108086381256799122
+      Dude_Monster_Idle_4_3: -3108282994932266067
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

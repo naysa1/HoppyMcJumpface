@@ -272,7 +272,13 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      Dude_Monster_Attack2_6_0: -3814611876042757650
+      Dude_Monster_Attack2_6_1: 7506755923100396584
+      Dude_Monster_Attack2_6_2: -2609699676031043709
+      Dude_Monster_Attack2_6_3: 5076982136277686007
+      Dude_Monster_Attack2_6_4: -1614119828179999095
+      Dude_Monster_Attack2_6_5: -7148735266954925622
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

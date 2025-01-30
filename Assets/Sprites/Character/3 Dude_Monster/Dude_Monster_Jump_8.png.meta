@@ -322,7 +322,15 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      Dude_Monster_Jump_8_0: 1838096197182096482
+      Dude_Monster_Jump_8_1: -9170048466037954844
+      Dude_Monster_Jump_8_2: 2853994254141089806
+      Dude_Monster_Jump_8_3: 4749585901661706019
+      Dude_Monster_Jump_8_4: 23112302655633720
+      Dude_Monster_Jump_8_5: -4003364644070847232
+      Dude_Monster_Jump_8_6: -7685662837107608344
+      Dude_Monster_Jump_8_7: 5039397777894316725
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

@@ -222,7 +222,11 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      Pink_Monster_Idle_4_0: -2222671339359911295
+      Pink_Monster_Idle_4_1: 2425431467501175809
+      Pink_Monster_Idle_4_2: 6869693272701700846
+      Pink_Monster_Idle_4_3: 2040477417508173474
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

@@ -272,7 +272,13 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      Pink_Monster_Push_6_0: 595661573533270607
+      Pink_Monster_Push_6_1: 3380867843975962835
+      Pink_Monster_Push_6_2: 8767817562348655431
+      Pink_Monster_Push_6_3: -7016653239807626574
+      Pink_Monster_Push_6_4: -2836629171940628902
+      Pink_Monster_Push_6_5: 1645720435441620283
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

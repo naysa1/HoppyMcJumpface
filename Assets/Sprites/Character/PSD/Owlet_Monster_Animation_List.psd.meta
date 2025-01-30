@@ -147,7 +147,8 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      Owlet_Monster_Animation_List_0: 1257903287466586888
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

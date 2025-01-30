@@ -147,7 +147,8 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      Dude_Monster_Animation_List_0: 1396853489120900545
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
