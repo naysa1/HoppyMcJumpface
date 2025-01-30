@@ -10,7 +10,9 @@ public class PlayerMovement : MonoBehaviour
     private Vector3 originalScale;
     private Animator anim;
     [SerializeField] private bool Grounded;
+
     private bool isChargingJump = false;
+    private bool movementLocked = false;
 
     private void Awake()
     {
@@ -22,8 +24,13 @@ public class PlayerMovement : MonoBehaviour
     private void Update()
     {
         float horizontalInput = Input.GetAxis("Horizontal"); // saving user input 
-        body.linearVelocity = new Vector2(horizontalInput * speed, body.linearVelocity.y); // moving user horizontally 
-
+        if (movementLocked == false)
+        {
+            body.linearVelocity = new Vector2(horizontalInput * speed, body.linearVelocity.y); // moving user horizontally 
+        } else
+        {
+            body.linearVelocity = Vector2.zero; // lock movement 
+        }
         // Flip sprite based on movement direction
         if (horizontalInput > 0.01f)
         {
@@ -37,7 +44,8 @@ public class PlayerMovement : MonoBehaviour
         // Start charging jump
         if (Grounded && (Input.GetKey(KeyCode.Space) || Input.GetKey(KeyCode.UpArrow))) 
         {
-            isChargingJump = true;
+            //movementLocked = true; //Frog cannot move
+            isChargingJump = movementLocked = true;
             jumpCharge += jumpChargeRate * Time.deltaTime; // Increase jump charge
             jumpCharge = Mathf.Clamp(jumpCharge, 0f, maxJumpValue); // Limit to maxJumpValue
         }
@@ -49,10 +57,11 @@ public class PlayerMovement : MonoBehaviour
             jumpCharge = 0f; // Reset jump charge
             isChargingJump = false;
             Grounded = false; // Frog is airborne
+            movementLocked = false; //Frog can move
         }
 
         // Update animator parameters
-        anim.SetBool("Run", horizontalInput != 0);
+        anim.SetBool("Run", body.linearVelocity != Vector2.zero);
         anim.SetBool("Grounded", Grounded);
     }
 
