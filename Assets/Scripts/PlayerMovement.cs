@@ -20,6 +20,7 @@ public class PlayerMovement : MonoBehaviour
         body = GetComponent<Rigidbody2D>();
         originalScale = transform.localScale;
         anim = GetComponent<Animator>();
+        body.freezeRotation = true;
     }
 
     private void Update()
