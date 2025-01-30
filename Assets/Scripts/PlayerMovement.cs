@@ -72,6 +72,13 @@ public class PlayerMovement : MonoBehaviour
         {
             Grounded = true;
         }
+        if (collision.gameObject.CompareTag("Tilemap"))
+        {
+            if(collision.contacts[0].normal.y == 1)
+            {
+                Grounded = true;
+            }
+        }
     }
 }
 
