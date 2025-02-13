@@ -1,6 +1,7 @@
 using Unity.VisualScripting;
 using UnityEditor.ShaderGraph.Internal;
 using UnityEngine;
+using UnityEngine.Tilemaps;
 using UnityEngine.WSA;
 
 public class PlayerMovement : MonoBehaviour
@@ -71,7 +72,10 @@ public class PlayerMovement : MonoBehaviour
         {
             transform.localScale = new Vector3(-originalScale.x, originalScale.y, originalScale.z);
         }
-
+        if (body.linearVelocity.y < 0f)
+        {
+            Grounded = false;
+        }
         // Start charging jump
         if (Grounded && (Input.GetKey(KeyCode.Space) || Input.GetKey(KeyCode.UpArrow))) 
         {
