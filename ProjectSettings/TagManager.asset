@@ -7,11 +7,12 @@ TagManager:
   - Ground
   - Block
   - Tilemap
+  - Wall
   layers:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - 
+  - Wall
   - Water
   - UI
   - 
