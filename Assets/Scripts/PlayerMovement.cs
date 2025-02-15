@@ -72,7 +72,7 @@ public class PlayerMovement : MonoBehaviour
         {
             transform.localScale = new Vector3(-originalScale.x, originalScale.y, originalScale.z);
         }
-        if (body.linearVelocity.y < 0f)
+        if (body.linearVelocity.y < -0.1f)
         {
             Grounded = false;
         }
@@ -98,6 +98,7 @@ public class PlayerMovement : MonoBehaviour
         // Update animator parameters
         anim.SetBool("Run", body.linearVelocity != Vector2.zero);
         anim.SetBool("Grounded", Grounded);
+
     }
 
     private void OnCollisionEnter2D(Collision2D collision)
