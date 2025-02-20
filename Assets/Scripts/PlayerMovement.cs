@@ -7,6 +7,7 @@ using UnityEngine.WSA;
 public class PlayerMovement : MonoBehaviour
 {
     private Rigidbody2D body;
+    private Collider2D collision;
     [SerializeField] private float speed; // Speed of horizontal movement
     [SerializeField] private float maxJumpValue = 20f; // Maximum jump force
     [SerializeField] private float jumpChargeRate = 40f; // Rate at which jump force increases
@@ -35,6 +36,8 @@ public class PlayerMovement : MonoBehaviour
         anim = GetComponent<Animator>();
         body.freezeRotation = true;
         ignoreInput = false;
+        collision = GetComponent<Collider2D>();
+
     }
 
     private void Update()
@@ -94,7 +97,21 @@ public class PlayerMovement : MonoBehaviour
             Grounded = false; // Frog is airborne
             movementLocked = false; //Frog can move
         }
+        /*
+        if (collision.gameObject.CompareTag("Ground"))
+        {
+            Grounded = true;
+            ignoreInput = false;
+            movementLocked = false;
+        }
+        if (collision.gameObject.CompareTag("Wall"))
+        {
+            ignoreInput = true;
+            Grounded = false;
 
+            body.linearVelocity = new Vector2(bounceDir * (speed / 2), body.linearVelocity.y);
+        }
+        */
         // Update animator parameters
         anim.SetBool("Run", body.linearVelocity != Vector2.zero);
         anim.SetBool("Grounded", Grounded);
@@ -119,7 +136,7 @@ public class PlayerMovement : MonoBehaviour
             //WallCheck();
         }
     }
-
+    
     void WallCheck()
     {
         //if touching a wall
