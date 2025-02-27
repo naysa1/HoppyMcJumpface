@@ -175,7 +175,7 @@ public class PlayerController : MonoBehaviour
     private float movementInputDirection;
     private Rigidbody2D body;
     private bool isFacingRight = true;
-    private bool isWalking;
+
     // [SerializeField] private float maxJumpValue = 20f; // Maximum jump force
     // [SerializeField] private float jumpChargeRate = 40f; // Rate at which jump force increases
     // private float jumpCharge = 5f; // Current jump charge
@@ -183,7 +183,13 @@ public class PlayerController : MonoBehaviour
     //public variables
     public float movementSpeed = 10.0f;
     public float jumpForce = 16.0f;
+    public float groundCheckRadius;
+    public bool isWalking;
+    public bool isGrounded;
+
     public Transform groundCheck;
+    
+    public LayerMask whatIsGround;
 
 
 
@@ -200,8 +206,12 @@ public class PlayerController : MonoBehaviour
 
     private void FixedUpdate() {
         ApplyMovement();
+        CheckSurroundings();
     }
 
+    private void CheckSurroundings() {
+        isGrounded = Physics2D.OverlapCircle(groundCheck.position, groundCheckRadius, whatIsGround);
+    }
     private void CheckMovementDirection() {
         if(isFacingRight && movementInputDirection < 0) {
             Flip();
@@ -252,5 +262,9 @@ public class PlayerController : MonoBehaviour
     private void Flip() {
         isFacingRight = !isFacingRight;
         transform.Rotate(0.0f, 180.0f, 0.0f);
+    }
+
+    private void OnDrawGizmos() {
+        Gizmos.DrawWireSphere(groundCheck.position, groundCheckRadius);
     }
 }

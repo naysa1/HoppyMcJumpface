@@ -274,7 +274,7 @@ Transform:
   m_GameObject: {fileID: 295047822}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.42000008, z: -10}
+  m_LocalPosition: {x: 0, y: 0.385, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -529,7 +529,7 @@ Transform:
   m_GameObject: {fileID: 519420028}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.42000008, z: -10}
+  m_LocalPosition: {x: 0, y: 0.385, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -707,7 +707,7 @@ Transform:
   m_GameObject: {fileID: 676606093}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: -0.1, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -903,7 +903,7 @@ BoxCollider2D:
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
-  m_Offset: {x: 0.0013492554, y: -0.025544018}
+  m_Offset: {x: 0, y: 0.0070645027}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
@@ -913,7 +913,7 @@ BoxCollider2D:
     drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
-  m_Size: {x: 0.26528773, y: 0.17619324}
+  m_Size: {x: 0.32, y: 0.23587099}
   m_EdgeRadius: 0
 --- !u!212 &1070614134
 SpriteRenderer:
@@ -979,7 +979,7 @@ Transform:
   m_GameObject: {fileID: 1070614131}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: -2.08, z: 0}
+  m_LocalPosition: {x: 0, y: -2.115, z: 0}
   m_LocalScale: {x: 5.76, y: 5.76, z: 5.76}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -1000,7 +1000,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   movementSpeed: 10
   jumpForce: 16
+  groundCheckRadius: 0.4
+  isWalking: 0
+  isGrounded: 0
   groundCheck: {fileID: 676606094}
+  whatIsGround:
+    serializedVersion: 2
+    m_Bits: 256
 --- !u!95 &1070614137
 Animator:
   serializedVersion: 7
@@ -1069,7 +1075,7 @@ GameObject:
   - component: {fileID: 2066319596}
   - component: {fileID: 2066319598}
   - component: {fileID: 2066319597}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Platform
   m_TagString: Tilemap
   m_Icon: {fileID: 0}
