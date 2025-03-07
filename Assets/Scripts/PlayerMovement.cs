@@ -212,19 +212,34 @@ public class PlayerController : MonoBehaviour
     private void CheckSurroundings() {
         isGrounded = Physics2D.OverlapCircle(groundCheck.position, groundCheckRadius, whatIsGround);
     }
-    private void CheckMovementDirection() {
-        if(isFacingRight && movementInputDirection < 0) {
-            Flip();
-        } else if(!isFacingRight && movementInputDirection > 0) {
-            Flip();
-        }
+    // private void CheckMovementDirection() {
+    //     if (isFacingRight && movementInputDirection < 0) {
+    //         Flip();
+    //     } else if (!isFacingRight && movementInputDirection > 0) {
+    //         Flip();
+    //     }
 
-        if(body.linearVelocity.x != 0) {
-            isWalking = true;
-        } else {
-            isWalking = false;
-        }
+    //     if (body.linearVelocity.x != 0 || movementInputDirection != 0) {
+    //         isWalking = true;
+    //     } else {
+    //         isWalking = false;
+    //     }
+    // }
+    private void CheckMovementDirection() {
+    if (isFacingRight && movementInputDirection < 0) {
+        Flip();
+    } else if (!isFacingRight && movementInputDirection > 0) {
+        Flip();
     }
+
+    // Ensure isWalking is only true if velocity is non-zero and input is being given
+    if (Mathf.Abs(body.linearVelocity.x) > 0.1f && Mathf.Abs(movementInputDirection) > 0) {
+        isWalking = true;
+    } else {
+        isWalking = false;
+    }
+}
+
 
     private void CheckInput() {
 
