@@ -1,285 +1,131 @@
-// using Unity.VisualScripting;
-// using UnityEditor.ShaderGraph.Internal;
-// using UnityEngine;
-// using UnityEngine.Tilemaps;
-// using UnityEngine.WSA;
-
-// public class PlayerMovement : MonoBehaviour
-// {
-//     private Rigidbody2D body;
-//     private Collider2D collision;
-//     [SerializeField] private float speed; // Speed of horizontal movement
-//     [SerializeField] private float maxJumpValue = 20f; // Maximum jump force
-//     [SerializeField] private float jumpChargeRate = 40f; // Rate at which jump force increases
-//     private float jumpCharge = 5f; // Current jump charge
-//     private float slideFactor = 5f;
-//     private Vector3 originalScale;
-//     private Animator anim;
-//     [SerializeField] private bool Grounded;
-
-//     private bool isChargingJump = false;
-//     private bool movementLocked = false;
-//     private bool isSliding = false;
-//     private bool ignoreInput;
-//     private float bounceDir = 0f;
-//     private const float wallCheckRadius = 0.5f;
-
-//     public Transform wallCheckCollider;
-//     public LayerMask wallLayer;
-
-    
-
-//     private void Awake()
-//     {
-//         body = GetComponent<Rigidbody2D>();
-//         originalScale = transform.localScale;
-//         anim = GetComponent<Animator>();
-//         body.freezeRotation = true;
-//         ignoreInput = false;
-//         collision = GetComponent<Collider2D>();
-
-//     }
-
-//     private void Update()
-//     {
-//         // movemvent script
-//         float horizontalInput;
-//         if (!ignoreInput)
-//         {
-//             horizontalInput = Input.GetAxis("Horizontal"); // saving user input
-//             if (horizontalInput < 0f)
-//             {
-//                 bounceDir = 1.0f;
-//             } else if (horizontalInput > 0f)
-//             {
-//                 bounceDir = -1.0f;
-//             }
-//         } else
-//         {
-//             horizontalInput = 1.0f;
-//         }
-//         if (!movementLocked && !ignoreInput)
-//         {
-//             body.linearVelocity = new Vector2(horizontalInput * speed, body.linearVelocity.y); // moving user horizontally 
-//         } else if (movementLocked)
-//         {
-//             body.linearVelocity = Vector2.zero; // lock movement 
-//         }
-
-//         // Flip sprite based on movement direction
-//         if (horizontalInput > 0.01f)
-//         {
-//             transform.localScale = new Vector3(originalScale.x, originalScale.y, originalScale.z);
-//         }
-//         if (horizontalInput < -0.01f)
-//         {
-//             transform.localScale = new Vector3(-originalScale.x, originalScale.y, originalScale.z);
-//         }
-//         if (body.linearVelocity.y < -0.1f)
-//         {
-//             Grounded = false;
-//         }
-//         // Start charging jump
-//         if (Grounded && (Input.GetKey(KeyCode.Space) || Input.GetKey(KeyCode.UpArrow))) 
-//         {
-//             //movementLocked = true; //Frog cannot move
-//             isChargingJump = movementLocked = true;
-//             jumpCharge += jumpChargeRate * Time.deltaTime; // Increase jump charge
-//             jumpCharge = Mathf.Clamp(jumpCharge, 0f, maxJumpValue); // Limit to maxJumpValue
-//         }
-
-//         // Release jump
-//         if (isChargingJump && (Input.GetKeyUp(KeyCode.Space) || Input.GetKeyUp(KeyCode.UpArrow)))
-//         {
-//             body.linearVelocity = new Vector2(body.linearVelocity.x, jumpCharge); // Apply jump force
-//             jumpCharge = 0f; // Reset jump charge
-//             isChargingJump = false;
-//             Grounded = false; // Frog is airborne
-//             movementLocked = false; //Frog can move
-//         }
-//         /*
-//         if (collision.gameObject.CompareTag("Ground"))
-//         {
-//             Grounded = true;
-//             ignoreInput = false;
-//             movementLocked = false;
-//         }
-//         if (collision.gameObject.CompareTag("Wall"))
-//         {
-//             ignoreInput = true;
-//             Grounded = false;
-
-//             body.linearVelocity = new Vector2(bounceDir * (speed / 2), body.linearVelocity.y);
-//         }
-//         */
-//         // Update animator parameters
-//         anim.SetBool("Run", body.linearVelocity != Vector2.zero);
-//         anim.SetBool("Grounded", Grounded);
-
-//     }
-
-//     private void OnCollisionEnter2D(Collision2D collision)
-//     {
-//         if (collision.gameObject.CompareTag("Ground"))
-//         {
-//             Grounded = true;
-//             ignoreInput = false;
-//             movementLocked = false;
-//         }
-//         if (collision.gameObject.CompareTag("Wall"))
-//         {
-//             ignoreInput = true;
-//             Grounded = false;
-
-//             body.linearVelocity = new Vector2(bounceDir*(speed/2), body.linearVelocity.y); // moving user horizontally
-            
-//             //WallCheck();
-//         }
-//     }
-    
-//     void WallCheck()
-//     {
-//         //if touching a wall
-//         //moving towards wall
-//         //falling
-//         //not grounded
-//         //slide on wall
-//         if(Physics2D.OverlapCircle(wallCheckCollider.position, wallCheckRadius, wallLayer)
-//             && Mathf.Abs(Input.GetAxis("Horizontal")) > 1
-//             && body.linearVelocityY <= 0
-//             && !Grounded)
-//         {
-//             Vector2 v = body.linearVelocity;
-//             v.y = -slideFactor;
-//             body.linearVelocity = v;
-//             isSliding = true;
-//             if (!isSliding)
-//             {
-//                 //Grounded = movementLocked = false;
-//             }
-//         }
-//         else
-//         {
-//             isSliding = false;
-//         }
-//     }
-// }
-
 using UnityEngine;
-using System.Collections.Generic;
-using System.Collections;
 
 public class PlayerController : MonoBehaviour
 {
-    //private variables
+    // Private variables
     private float movementInputDirection;
     private Rigidbody2D body;
     private bool isFacingRight = true;
+    private float jumpCharge = 5f;
+    private bool isChargingJump = false;
+    private bool movementLocked = false;
+    private float velocitySmoothing;
+    private float lastGroundedTime;
+    private float lastJumpInputTime;
 
-    // [SerializeField] private float maxJumpValue = 20f; // Maximum jump force
-    // [SerializeField] private float jumpChargeRate = 40f; // Rate at which jump force increases
-    // private float jumpCharge = 5f; // Current jump charge
+    [Header("Movement Settings")]
+    [SerializeField] private float movementSpeed = 10.0f;
+    [SerializeField] private float acceleration = 8f;
+    [SerializeField] private float deceleration = 8f;
+    [SerializeField] private float airControlFactor = 0.75f;
 
-    //public variables
-    public float movementSpeed = 10.0f;
-    public float jumpForce = 16.0f;
-    public float groundCheckRadius;
+    [Header("Jump Settings")]
+    [SerializeField] private float jumpForce = 16.0f;
+    [SerializeField] private float maxJumpValue = 20f;
+    [SerializeField] private float jumpChargeRate = 40f;
+    [SerializeField] private float coyoteTime = 0.2f;
+    [SerializeField] private float jumpBufferTime = 0.2f;
+
+    [Header("Ground Detection")]
+    [SerializeField] private Transform groundCheck;
+    [SerializeField] private float groundCheckRadius = 0.2f;
+    [SerializeField] private LayerMask whatIsGround;
+
     public bool isWalking;
     public bool isGrounded;
+    public bool canJump;
 
-    public Transform groundCheck;
-    
-    public LayerMask whatIsGround;
-
-
-
-    //Start is called before first frame update
-    void Start() {
+    void Start()
+    {
         body = GetComponent<Rigidbody2D>();
+        body.freezeRotation = true;
+        body.collisionDetectionMode = CollisionDetectionMode2D.Continuous;
+        body.constraints = RigidbodyConstraints2D.FreezeRotation;
     }
 
-    //Update is called once per frame 
-    void Update() {
+    void Update()
+    {
         CheckInput();
         CheckMovementDirection();
+        UpdateJumpState();
     }
 
-    private void FixedUpdate() {
+    private void FixedUpdate()
+    {
         ApplyMovement();
         CheckSurroundings();
     }
 
-    private void CheckSurroundings() {
+    private void CheckSurroundings()
+    {
+        bool wasGrounded = isGrounded;
         isGrounded = Physics2D.OverlapCircle(groundCheck.position, groundCheckRadius, whatIsGround);
-    }
-    // private void CheckMovementDirection() {
-    //     if (isFacingRight && movementInputDirection < 0) {
-    //         Flip();
-    //     } else if (!isFacingRight && movementInputDirection > 0) {
-    //         Flip();
-    //     }
 
-    //     if (body.linearVelocity.x != 0 || movementInputDirection != 0) {
-    //         isWalking = true;
-    //     } else {
-    //         isWalking = false;
-    //     }
-    // }
-    private void CheckMovementDirection() {
-    if (isFacingRight && movementInputDirection < 0) {
-        Flip();
-    } else if (!isFacingRight && movementInputDirection > 0) {
-        Flip();
+        if (isGrounded)
+            lastGroundedTime = Time.time; // Update coyote time
+
+        if (!wasGrounded && isGrounded) 
+            jumpCharge = 5f; // Reset jump charge on landing
     }
 
-    // Ensure isWalking is only true if velocity is non-zero and input is being given
-    if (Mathf.Abs(body.linearVelocity.x) > 0.1f && Mathf.Abs(movementInputDirection) > 0) {
-        isWalking = true;
-    } else {
-        isWalking = false;
+    private void UpdateJumpState()
+    {
+        canJump = Time.time - lastGroundedTime <= coyoteTime;
     }
-}
 
+    private void CheckMovementDirection()
+    {
+        if (isFacingRight && movementInputDirection < 0)
+            Flip();
+        else if (!isFacingRight && movementInputDirection > 0)
+            Flip();
 
-    private void CheckInput() {
+        isWalking = Mathf.Abs(body.linearVelocity.x) > 0.1f && Mathf.Abs(movementInputDirection) > 0;
+    }
 
-        movementInputDirection = Input.GetAxis("Horizontal"); // saving user input
+    private void CheckInput()
+    {
+        movementInputDirection = Input.GetAxisRaw("Horizontal");
 
-        if(Input.GetButtonDown("Jump")) {
-            Jump();
+        if (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.UpArrow))
+            lastJumpInputTime = Time.time; // Buffer jump input
+
+        if ((Input.GetKey(KeyCode.Space) || Input.GetKey(KeyCode.UpArrow)) && canJump)
+        {
+            isChargingJump = true;
+            movementLocked = true;
+            jumpCharge += jumpChargeRate * Time.deltaTime;
+            jumpCharge = Mathf.Clamp(jumpCharge, 5f, maxJumpValue);
+        }
+
+        if (isChargingJump && (Input.GetKeyUp(KeyCode.Space) || Input.GetKeyUp(KeyCode.UpArrow)))
+        {
+            if (Time.time - lastGroundedTime <= coyoteTime || Time.time - lastJumpInputTime <= jumpBufferTime)
+                body.linearVelocity = new Vector2(body.linearVelocity.x, jumpCharge);
+
+            jumpCharge = 5f;
+            isChargingJump = false;
+            movementLocked = false;
         }
     }
 
-    private void Jump() {
-        // if (Grounded && (Input.GetKey(KeyCode.Space) || Input.GetKey(KeyCode.UpArrow))) 
-        // {
-        //     //movementLocked = true; //Frog cannot move
-        //     isChargingJump = movementLocked = true;
-        //     jumpCharge += jumpChargeRate * Time.deltaTime; // Increase jump charge
-        //     jumpCharge = Mathf.Clamp(jumpCharge, 0f, maxJumpValue); // Limit to maxJumpValue
-        // }
-
-        // // Release jump
-        // if (isChargingJump && (Input.GetKeyUp(KeyCode.Space) || Input.GetKeyUp(KeyCode.UpArrow)))
-        // {
-        //     body.linearVelocity = new Vector2(body.linearVelocity.x, jumpCharge); // Apply jump force
-        //     jumpCharge = 0f; // Reset jump charge
-        //     isChargingJump = false;
-        //     Grounded = false; // Frog is airborne
-        //     movementLocked = false; //Frog can move
-        // }
-        body.linearVelocity = new Vector2(body.linearVelocity.x, jumpForce);
-    }
-    private void ApplyMovement() {
-        body.linearVelocity = new Vector2(movementSpeed * movementInputDirection, body.linearVelocity.y);
+    private void ApplyMovement()
+    {
+        float targetSpeed = movementInputDirection * movementSpeed;
+        float smoothTime = isGrounded ? (movementInputDirection == 0 ? deceleration : acceleration) : acceleration * airControlFactor;
+        
+        float newSpeed = Mathf.SmoothDamp(body.linearVelocity.x, targetSpeed, ref velocitySmoothing, 1f / smoothTime);
+        body.linearVelocity = new Vector2(newSpeed, body.linearVelocity.y);
     }
 
-    private void Flip() {
+    private void Flip()
+    {
         isFacingRight = !isFacingRight;
         transform.Rotate(0.0f, 180.0f, 0.0f);
     }
 
-    private void OnDrawGizmos() {
+    private void OnDrawGizmos()
+    {
         Gizmos.DrawWireSphere(groundCheck.position, groundCheckRadius);
     }
 }
