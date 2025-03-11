@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 5f83b5a40fc8c42039f3571b4a82ea54
+guid: d074f904a93d940eb937482992eea34b
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -605041426375962397
-    second: frog king pc pixel art_0
+      213: -3737618702968128926
+    second: Tile_23_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -113,7 +113,7 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: frog king pc pixel art_0
+      name: Tile_23_0
       rect:
         serializedVersion: 2
         x: 0
@@ -128,8 +128,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 3e0177247067a97f0800000000000000
-      internalID: -605041426375962397
+      spriteID: 26a7ab7a79f412cc0800000000000000
+      internalID: -3737618702968128926
       vertices: []
       indices: 
       edges: []
@@ -148,7 +148,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      frog king pc pixel art_0: -605041426375962397
+      Tile_23_0: -3737618702968128926
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

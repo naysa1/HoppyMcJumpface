@@ -68,9 +68,16 @@ public class PlayerMovement : MonoBehaviour
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        if (collision.gameObject.CompareTag("Ground"))
+        if (collision.gameObject.CompareTag("Tilemap"))
         {
             Grounded = true;
+        }
+        if (collision.gameObject.CompareTag("Tilemap"))
+        {
+            if(collision.contacts[0].normal.y == 1)
+            {
+                Grounded = true;
+            }
         }
     }
 }
