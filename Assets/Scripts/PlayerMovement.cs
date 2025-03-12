@@ -106,10 +106,12 @@ public class PlayerController : MonoBehaviour
         if (!ignoreInput)
         {
             movementInputDirection = Input.GetAxisRaw("Horizontal");
-            if (movementInputDirection < 0) {
+            if (movementInputDirection < 0)
+            {
                 bounceDir = 1;
-            } 
-            else if (movementInputDirection > 0) {
+            }
+            else if (movementInputDirection > 0)
+            {
                 bounceDir = -1;
             }
         }
@@ -117,6 +119,8 @@ public class PlayerController : MonoBehaviour
         {
             movementInputDirection = 1.0f;
         }
+
+
 
         if (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.UpArrow))
             lastJumpInputTime = Time.time; // Buffer jump input
