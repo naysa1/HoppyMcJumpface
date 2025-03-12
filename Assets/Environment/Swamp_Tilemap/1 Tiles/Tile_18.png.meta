@@ -148,11 +148,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-<<<<<<< HEAD:Assets/Sprites/Character/Frog/frog king pc pixel art.jpg.meta
-      frog king pc pixel art_0: -605041426375962397
-=======
       Tile_18_0: 70225601191013823
->>>>>>> naysa-branch:Assets/Environment/Swamp_Tilemap/1 Tiles/Tile_18.png.meta
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

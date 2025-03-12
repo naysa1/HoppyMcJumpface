@@ -31,8 +31,13 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float groundCheckRadius = 0.2f;
     [SerializeField] private LayerMask whatIsGround;
 
+    [Header("Wall Detection")]
+    [SerializeField] private Transform wallCheck;
+    [SerializeField] private float wallCheckRadius = 0.2f;
+
     public bool isWalking;
     public bool isGrounded;
+    public bool isWall;
     public bool canJump;
 
     void Start()
@@ -59,7 +64,17 @@ public class PlayerController : MonoBehaviour
     private void CheckSurroundings()
     {
         bool wasGrounded = isGrounded;
+        bool touchedWall = isWall;
+
         isGrounded = Physics2D.OverlapCircle(groundCheck.position, groundCheckRadius, whatIsGround);
+        isWall = Physics2D.OverlapCircle(wallCheck.position, wallCheckRadius, whatIsGround);
+
+        // bounce off wall collision
+        if (isWall && !isGrounded)
+        {
+            movementLocked = true;
+            body.linearVelocity = new Vector2(-body.linearVelocity.x, body.linearVelocity.y);
+        }
 
         if (isGrounded)
             lastGroundedTime = Time.time; // Update coyote time
@@ -85,7 +100,13 @@ public class PlayerController : MonoBehaviour
 
     private void CheckInput()
     {
-        movementInputDirection = Input.GetAxisRaw("Horizontal");
+        if (!movementLocked) {
+            movementInputDirection = Input.GetAxisRaw("Horizontal");
+        }
+        else {
+            movementInputDirection = 0.0f;
+            body.linearVelocity = Vector2.zero;
+        }
 
         if (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.UpArrow))
             lastJumpInputTime = Time.time; // Buffer jump input
@@ -116,6 +137,7 @@ public class PlayerController : MonoBehaviour
         
         float newSpeed = Mathf.SmoothDamp(body.linearVelocity.x, targetSpeed, ref velocitySmoothing, 1f / smoothTime);
         body.linearVelocity = new Vector2(newSpeed, body.linearVelocity.y);
+
     }
 
     private void Flip()
