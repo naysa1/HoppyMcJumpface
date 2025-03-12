@@ -60,7 +60,13 @@ public class PlayerController : MonoBehaviour
 
     private void FixedUpdate()
     {
-        ApplyMovement();
+        if (!movementLocked && !ignoreInput)
+        {
+            ApplyMovement();
+        } else if (movementLocked)
+        {
+            body.linearVelocity = Vector2.zero;
+        }
         CheckSurroundings();
     }
 
@@ -72,12 +78,8 @@ public class PlayerController : MonoBehaviour
         isGrounded = Physics2D.OverlapCircle(groundCheck.position, groundCheckRadius, whatIsGround);
         isWall = Physics2D.OverlapCircle(wallCheck.position, wallCheckRadius, whatIsGround);
 
-        // bounce off wall collision
-        if (isWall && !isGrounded) {
-            body.linearVelocity = new Vector2(bounceDir * (movementSpeed/2), body.linearVelocity.y);
-        }
-
         if (isGrounded) {
+            ignoreInput = false;
             lastGroundedTime = Time.time; // Update coyote time
         }
         if (!wasGrounded && isGrounded)
@@ -101,12 +103,19 @@ public class PlayerController : MonoBehaviour
 
     private void CheckInput()
     {
-        if (movementLocked) {
-            movementInputDirection = 0f;
-            body.linearVelocity = Vector2.zero;
-        }
-        else {
+        if (!ignoreInput)
+        {
             movementInputDirection = Input.GetAxisRaw("Horizontal");
+            if (movementInputDirection < 0) {
+                bounceDir = 1;
+            } 
+            else if (movementInputDirection > 0) {
+                bounceDir = -1;
+            }
+        }
+        else 
+        {
+            movementInputDirection = 1.0f;
         }
 
         if (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.UpArrow))
@@ -129,6 +138,12 @@ public class PlayerController : MonoBehaviour
             isChargingJump = false;
             movementLocked = false;
         }
+        // bounce off wall collision
+        if (isWall && !isGrounded)
+        {
+            ignoreInput = true;
+            body.linearVelocity = new Vector2(bounceDir * (movementSpeed / 2), body.linearVelocity.y);
+        }
     }
 
     private void ApplyMovement()
@@ -138,12 +153,10 @@ public class PlayerController : MonoBehaviour
         
         float newSpeed = Mathf.SmoothDamp(body.linearVelocity.x, targetSpeed, ref velocitySmoothing, 1f / smoothTime);
         body.linearVelocity = new Vector2(newSpeed, body.linearVelocity.y);
-
     }
 
     private void Flip()
     {
-        bounceDir *= -1;
         isFacingRight = !isFacingRight;
         transform.Rotate(0.0f, 180.0f, 0.0f);
     }
