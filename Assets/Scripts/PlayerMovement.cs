@@ -1,3 +1,4 @@
+using NUnit.Framework;
 using UnityEngine;
 
 public class PlayerController : MonoBehaviour
@@ -35,6 +36,8 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private Transform wallCheck;
     [SerializeField] private float wallCheckRadius = 0.2f;
 
+    private int bounceDir = 1;
+    public bool ignoreInput;
     public bool isWalking;
     public bool isGrounded;
     public bool isWall;
@@ -70,16 +73,14 @@ public class PlayerController : MonoBehaviour
         isWall = Physics2D.OverlapCircle(wallCheck.position, wallCheckRadius, whatIsGround);
 
         // bounce off wall collision
-        if (isWall && !isGrounded)
-        {
-            movementLocked = true;
-            body.linearVelocity = new Vector2(-body.linearVelocity.x, body.linearVelocity.y);
+        if (isWall && !isGrounded) {
+            body.linearVelocity = new Vector2(bounceDir * (movementSpeed/2), body.linearVelocity.y);
         }
 
-        if (isGrounded)
+        if (isGrounded) {
             lastGroundedTime = Time.time; // Update coyote time
-
-        if (!wasGrounded && isGrounded) 
+        }
+        if (!wasGrounded && isGrounded)
             jumpCharge = 5f; // Reset jump charge on landing
     }
 
@@ -100,12 +101,12 @@ public class PlayerController : MonoBehaviour
 
     private void CheckInput()
     {
-        if (!movementLocked) {
-            movementInputDirection = Input.GetAxisRaw("Horizontal");
+        if (movementLocked) {
+            movementInputDirection = 0f;
+            body.linearVelocity = Vector2.zero;
         }
         else {
-            movementInputDirection = 0.0f;
-            body.linearVelocity = Vector2.zero;
+            movementInputDirection = Input.GetAxisRaw("Horizontal");
         }
 
         if (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.UpArrow))
@@ -142,6 +143,7 @@ public class PlayerController : MonoBehaviour
 
     private void Flip()
     {
+        bounceDir *= -1;
         isFacingRight = !isFacingRight;
         transform.Rotate(0.0f, 180.0f, 0.0f);
     }
