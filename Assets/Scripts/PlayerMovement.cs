@@ -1,84 +1,131 @@
-using UnityEditor.ShaderGraph.Internal;
 using UnityEngine;
 
-public class PlayerMovement : MonoBehaviour
+public class PlayerController : MonoBehaviour
 {
+    // Private variables
+    private float movementInputDirection;
     private Rigidbody2D body;
-    [SerializeField] private float speed; // Speed of horizontal movement
-    [SerializeField] private float maxJumpValue = 20f; // Maximum jump force
-    [SerializeField] private float jumpChargeRate = 40f; // Rate at which jump force increases
-    private float jumpCharge = 5f; // Current jump charge
-    private Vector3 originalScale;
-    private Animator anim;
-    [SerializeField] private bool Grounded;
-
+    private bool isFacingRight = true;
+    private float jumpCharge = 5f;
     private bool isChargingJump = false;
     private bool movementLocked = false;
+    private float velocitySmoothing;
+    private float lastGroundedTime;
+    private float lastJumpInputTime;
 
-    private void Awake()
+    [Header("Movement Settings")]
+    [SerializeField] private float movementSpeed = 10.0f;
+    [SerializeField] private float acceleration = 8f;
+    [SerializeField] private float deceleration = 8f;
+    [SerializeField] private float airControlFactor = 0.75f;
+
+    [Header("Jump Settings")]
+    [SerializeField] private float jumpForce = 16.0f;
+    [SerializeField] private float maxJumpValue = 20f;
+    [SerializeField] private float jumpChargeRate = 40f;
+    [SerializeField] private float coyoteTime = 0.2f;
+    [SerializeField] private float jumpBufferTime = 0.2f;
+
+    [Header("Ground Detection")]
+    [SerializeField] private Transform groundCheck;
+    [SerializeField] private float groundCheckRadius = 0.2f;
+    [SerializeField] private LayerMask whatIsGround;
+
+    public bool isWalking;
+    public bool isGrounded;
+    public bool canJump;
+
+    void Start()
     {
         body = GetComponent<Rigidbody2D>();
-        originalScale = transform.localScale;
-        anim = GetComponent<Animator>();
+        body.freezeRotation = true;
+        body.collisionDetectionMode = CollisionDetectionMode2D.Continuous;
+        body.constraints = RigidbodyConstraints2D.FreezeRotation;
     }
 
-    private void Update()
+    void Update()
     {
-        float horizontalInput = Input.GetAxis("Horizontal"); // saving user input 
-        if (movementLocked == false)
+        CheckInput();
+        CheckMovementDirection();
+        UpdateJumpState();
+    }
+
+    private void FixedUpdate()
+    {
+        ApplyMovement();
+        CheckSurroundings();
+    }
+
+    private void CheckSurroundings()
+    {
+        bool wasGrounded = isGrounded;
+        isGrounded = Physics2D.OverlapCircle(groundCheck.position, groundCheckRadius, whatIsGround);
+
+        if (isGrounded)
+            lastGroundedTime = Time.time; // Update coyote time
+
+        if (!wasGrounded && isGrounded) 
+            jumpCharge = 5f; // Reset jump charge on landing
+    }
+
+    private void UpdateJumpState()
+    {
+        canJump = Time.time - lastGroundedTime <= coyoteTime;
+    }
+
+    private void CheckMovementDirection()
+    {
+        if (isFacingRight && movementInputDirection < 0)
+            Flip();
+        else if (!isFacingRight && movementInputDirection > 0)
+            Flip();
+
+        isWalking = Mathf.Abs(body.linearVelocity.x) > 0.1f && Mathf.Abs(movementInputDirection) > 0;
+    }
+
+    private void CheckInput()
+    {
+        movementInputDirection = Input.GetAxisRaw("Horizontal");
+
+        if (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.UpArrow))
+            lastJumpInputTime = Time.time; // Buffer jump input
+
+        if ((Input.GetKey(KeyCode.Space) || Input.GetKey(KeyCode.UpArrow)) && canJump)
         {
-            body.linearVelocity = new Vector2(horizontalInput * speed, body.linearVelocity.y); // moving user horizontally 
-        } else
-        {
-            body.linearVelocity = Vector2.zero; // lock movement 
-        }
-        // Flip sprite based on movement direction
-        if (horizontalInput > 0.01f)
-        {
-            transform.localScale = new Vector3(originalScale.x, originalScale.y, originalScale.z);
-        }
-        if (horizontalInput < -0.01f)
-        {
-            transform.localScale = new Vector3(-originalScale.x, originalScale.y, originalScale.z);
+            isChargingJump = true;
+            movementLocked = true;
+            jumpCharge += jumpChargeRate * Time.deltaTime;
+            jumpCharge = Mathf.Clamp(jumpCharge, 5f, maxJumpValue);
         }
 
-        // Start charging jump
-        if (Grounded && (Input.GetKey(KeyCode.Space) || Input.GetKey(KeyCode.UpArrow))) 
-        {
-            //movementLocked = true; //Frog cannot move
-            isChargingJump = movementLocked = true;
-            jumpCharge += jumpChargeRate * Time.deltaTime; // Increase jump charge
-            jumpCharge = Mathf.Clamp(jumpCharge, 0f, maxJumpValue); // Limit to maxJumpValue
-        }
-
-        // Release jump
         if (isChargingJump && (Input.GetKeyUp(KeyCode.Space) || Input.GetKeyUp(KeyCode.UpArrow)))
         {
-            body.linearVelocity = new Vector2(body.linearVelocity.x, jumpCharge); // Apply jump force
-            jumpCharge = 0f; // Reset jump charge
-            isChargingJump = false;
-            Grounded = false; // Frog is airborne
-            movementLocked = false; //Frog can move
-        }
+            if (Time.time - lastGroundedTime <= coyoteTime || Time.time - lastJumpInputTime <= jumpBufferTime)
+                body.linearVelocity = new Vector2(body.linearVelocity.x, jumpCharge);
 
-        // Update animator parameters
-        anim.SetBool("Run", body.linearVelocity != Vector2.zero);
-        anim.SetBool("Grounded", Grounded);
+            jumpCharge = 5f;
+            isChargingJump = false;
+            movementLocked = false;
+        }
     }
 
-    private void OnCollisionEnter2D(Collision2D collision)
+    private void ApplyMovement()
     {
-        if (collision.gameObject.CompareTag("Tilemap"))
-        {
-            Grounded = true;
-        }
-        if (collision.gameObject.CompareTag("Tilemap"))
-        {
-            if(collision.contacts[0].normal.y == 1)
-            {
-                Grounded = true;
-            }
-        }
+        float targetSpeed = movementInputDirection * movementSpeed;
+        float smoothTime = isGrounded ? (movementInputDirection == 0 ? deceleration : acceleration) : acceleration * airControlFactor;
+        
+        float newSpeed = Mathf.SmoothDamp(body.linearVelocity.x, targetSpeed, ref velocitySmoothing, 1f / smoothTime);
+        body.linearVelocity = new Vector2(newSpeed, body.linearVelocity.y);
+    }
+
+    private void Flip()
+    {
+        isFacingRight = !isFacingRight;
+        transform.Rotate(0.0f, 180.0f, 0.0f);
+    }
+
+    private void OnDrawGizmos()
+    {
+        Gizmos.DrawWireSphere(groundCheck.position, groundCheckRadius);
     }
 }
-
