@@ -29,6 +29,8 @@ public class PlayerController : MonoBehaviour
 
     [Header("Ground Detection")]
     [SerializeField] private Transform groundCheck;
+    [SerializeField] private Vector2 boxSize;
+    [SerializeField] private float castDistance;
     [SerializeField] private float groundCheckRadius = 0.2f;
     [SerializeField] private LayerMask whatIsGround;
 
@@ -75,7 +77,8 @@ public class PlayerController : MonoBehaviour
         bool wasGrounded = isGrounded;
         bool touchedWall = isWall;
 
-        isGrounded = Physics2D.OverlapCircle(groundCheck.position, groundCheckRadius, whatIsGround);
+        isGrounded = Physics2D.BoxCast(groundCheck.position, boxSize, 0, -transform.up, castDistance, whatIsGround);
+        //isGrounded = Physics2D.OverlapCircle(groundCheck.position, groundCheckRadius, whatIsGround);
         isWall = Physics2D.OverlapCircle(wallCheck.position, wallCheckRadius, whatIsGround);
 
         if (isGrounded) {
@@ -125,7 +128,7 @@ public class PlayerController : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.UpArrow))
             lastJumpInputTime = Time.time; // Buffer jump input
 
-        if ((Input.GetKey(KeyCode.Space) || Input.GetKey(KeyCode.UpArrow)) && canJump)
+        if ((Input.GetKey(KeyCode.Space) || Input.GetKey(KeyCode.UpArrow)) && /*canJump*/ isGrounded)
         {
             isChargingJump = true;
             movementLocked = true;
@@ -167,6 +170,7 @@ public class PlayerController : MonoBehaviour
 
     private void OnDrawGizmos()
     {
-        Gizmos.DrawWireSphere(groundCheck.position, groundCheckRadius);
+        //Gizmos.DrawWireSphere(groundCheck.position, groundCheckRadius);
+        Gizmos.DrawWireCube(groundCheck.position-transform.up*castDistance, boxSize);
     }
 }
