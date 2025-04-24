@@ -33,6 +33,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float castDistance;
     [SerializeField] private float groundCheckRadius = 0.2f;
     [SerializeField] private LayerMask whatIsGround;
+    [SerializeField] private LayerMask whatIsIce;
 
     [Header("Wall Detection")]
     [SerializeField] private Transform wallCheck;
@@ -42,6 +43,7 @@ public class PlayerController : MonoBehaviour
     public bool ignoreInput;
     public bool isWalking;
     public bool isGrounded;
+    public bool isIce;
     public bool isWall;
     public bool canJump;
 
@@ -77,9 +79,11 @@ public class PlayerController : MonoBehaviour
         bool wasGrounded = isGrounded;
         bool touchedWall = isWall;
 
-        isGrounded = Physics2D.BoxCast(groundCheck.position, boxSize, 0, -transform.up, castDistance, whatIsGround);
+        isGrounded = Physics2D.BoxCast(groundCheck.position, boxSize, 0, -transform.up, castDistance, whatIsGround | whatIsIce);
+        isIce = Physics2D.BoxCast(groundCheck.position, boxSize, 0, -transform.up, castDistance, whatIsIce);
         //isGrounded = Physics2D.OverlapCircle(groundCheck.position, groundCheckRadius, whatIsGround);
         isWall = Physics2D.OverlapCircle(wallCheck.position, wallCheckRadius, whatIsGround);
+
 
         if (isGrounded) {
             ignoreInput = false;
@@ -155,11 +159,50 @@ public class PlayerController : MonoBehaviour
 
     private void ApplyMovement()
     {
+        /*
         float targetSpeed = movementInputDirection * movementSpeed;
         float smoothTime = isGrounded ? (movementInputDirection == 0 ? deceleration : acceleration) : acceleration * airControlFactor;
         
         float newSpeed = Mathf.SmoothDamp(body.linearVelocity.x, targetSpeed, ref velocitySmoothing, 1f / smoothTime);
-        body.linearVelocity = new Vector2(newSpeed, body.linearVelocity.y);
+        float moveForce = Mathf.Clamp(targetSpeed, 0f, newSpeed);
+        if (isIce && body.linearVelocityX < newSpeed)
+        {
+            body.AddForce(new Vector2(moveForce, body.linearVelocity.y));
+        } else
+        {
+            body.linearVelocity = new Vector2(newSpeed, body.linearVelocity.y);
+        } */
+        
+         if (isIce)
+        {
+            float iceAccel = 2f;        // How quickly we approach target speed
+            float iceDrag = 1f;      // How much we preserve momentum
+
+            float desiredVelocityX = movementInputDirection * movementSpeed * 1.25f;
+
+            // Smooth velocity change on ice
+            float newVelocityX = Mathf.Lerp(body.linearVelocity.x, desiredVelocityX, Time.fixedDeltaTime * iceAccel);
+
+            // Preserve some of the previous velocity (simulate sliding)
+            newVelocityX *= iceDrag;
+
+            body.linearVelocity = new Vector2(newVelocityX, body.linearVelocity.y);
+        }
+        else
+        {
+            float groundAccel = 10f;
+            float desiredVelocityX = movementInputDirection * movementSpeed;
+            float newVelocityX = Mathf.Lerp(body.linearVelocity.x, desiredVelocityX, Time.fixedDeltaTime * groundAccel);
+            body.linearVelocity = new Vector2(newVelocityX, body.linearVelocity.y);
+
+            // body.linearVelocity = Mathf.Lerp(body.linearVelocity.x, desiredVelocityX, Time.deltaTime * groundAccel);
+        }
+
+
+
+
+
+
     }
 
     private void Flip()
@@ -171,6 +214,7 @@ public class PlayerController : MonoBehaviour
     private void OnDrawGizmos()
     {
         //Gizmos.DrawWireSphere(groundCheck.position, groundCheckRadius);
+        // makes raycast outline visible
         Gizmos.DrawWireCube(groundCheck.position-transform.up*castDistance, boxSize);
     }
 }
