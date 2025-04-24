@@ -202,6 +202,7 @@ public class PlayerController : MonoBehaviour
     public bool isWalking { get; private set; }
     public bool ignoreInput { get; private set; }
     private bool movementLocked = false;
+    private bool isOnIce = false;
 
     // === Movement Settings ===
     [Header("Movement Settings")]
@@ -212,7 +213,7 @@ public class PlayerController : MonoBehaviour
 
     // === Jump Settings ===
     [Header("Jump Settings")]
-    [SerializeField] private float jumpForce = 16.0f;
+    // [SerializeField] private float jumpForce = 16.0f;
     [SerializeField] private float maxJumpValue = 20f;
     [SerializeField] private float jumpChargeRate = 40f;
     [SerializeField] private float coyoteTime = 0.2f;
@@ -257,7 +258,6 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    // === Core Input Handling ===
     private void HandleInput()
     {
         movementInputDirection = ignoreInput ? 0 : Input.GetAxisRaw("Horizontal");
@@ -304,13 +304,37 @@ public class PlayerController : MonoBehaviour
         isWalking = Mathf.Abs(body.linearVelocity.x) > 0.1f && Mathf.Abs(movementInputDirection) > 0;
     }
 
-    private void ApplyMovement()
-    {
-        float targetSpeed = movementInputDirection * movementSpeed;
-        float smoothTime = isGrounded ? (movementInputDirection == 0 ? deceleration : acceleration)
-                                      : acceleration * airControlFactor;
+    private void ApplyMovement() {
+        float targetSpeed = movementInputDirection * movementSpeed; // Base target speed
+        float smoothTime;
 
-        float newSpeed = Mathf.SmoothDamp(body.linearVelocity.x, targetSpeed, ref velocitySmoothing, 1f / smoothTime);
+        if (isOnIce)
+        {
+            if (movementInputDirection == 0)
+            {
+                smoothTime = 0.8f; // Very slow deceleration — maintain slide
+                targetSpeed = body.linearVelocity.x; // Keep momentum
+            }
+            else
+            {
+                // On ice: slower to start, but if moving, allow high speed
+                float currentSpeed = Mathf.Abs(body.linearVelocity.x);
+                float boostedSpeed = Mathf.Clamp(currentSpeed + 2f, movementSpeed, movementSpeed * 2f); // gradually build up
+
+                targetSpeed = movementInputDirection * boostedSpeed; // build momentum over time
+                smoothTime = 0.5f; // slower acceleration initially
+            }
+        }
+        else if (isGrounded)
+        {
+            smoothTime = movementInputDirection == 0 ? 1f / deceleration : 1f / acceleration;
+        }
+        else
+        {
+            smoothTime = 1f / (acceleration * airControlFactor);
+        }
+
+        float newSpeed = Mathf.SmoothDamp(body.linearVelocity.x, targetSpeed, ref velocitySmoothing, smoothTime);
         body.linearVelocity = new Vector2(newSpeed, body.linearVelocity.y);
     }
 
@@ -319,28 +343,30 @@ public class PlayerController : MonoBehaviour
         canJump = Time.time - lastGroundedTime <= coyoteTime;
     }
 
-    // === Single Cast for Ground + Wall Detection ===
     private void DetectEnvironment()
     {
         RaycastHit2D hit = Physics2D.BoxCast(groundCheck.position, boxSize, 0f, -transform.up, castDistance, whatIsGround | whatIsIcy);
 
         isGrounded = false;
         isWall = false;
+        isOnIce = false;
 
         if (hit.collider != null)
         {
             Vector2 normal = hit.normal;
             int layer = hit.collider.gameObject.layer;
 
+            if (((1 << layer) & whatIsIcy) != 0) // This checks if the surface the player is standing on belongs to the whatIsIcy layer
+            {
+                isOnIce = true; //it sets isOnIce to true.
+            }
 
-            // Ground detection
             if (Vector2.Angle(normal, Vector2.up) < 45f)
             {
                 isGrounded = true;
                 lastGroundedTime = Time.time;
                 ignoreInput = false;
             }
-            // Wall detection
             else if (Vector2.Angle(normal, Vector2.right) < 45f || Vector2.Angle(normal, Vector2.left) < 45f)
             {
                 isWall = true;
@@ -368,3 +394,4 @@ public class PlayerController : MonoBehaviour
         }
     }
 }
+
