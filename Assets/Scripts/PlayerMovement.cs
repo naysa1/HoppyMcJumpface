@@ -36,7 +36,8 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private LayerMask whatIsIce;
 
     [Header("Wall Detection")]
-    [SerializeField] private Transform wallCheck;
+    [SerializeField] private Transform wallCheck1;
+    [SerializeField] private Transform wallCheck2;
     [SerializeField] private float wallCheckRadius = 0.2f;
 
     private int bounceDir = 1;
@@ -44,7 +45,8 @@ public class PlayerController : MonoBehaviour
     public bool isWalking;
     public bool isGrounded;
     public bool isIce;
-    public bool isWall;
+    public bool isWall1;
+    public bool isWall2;
     public bool canJump;
 
     void Start()
@@ -67,22 +69,42 @@ public class PlayerController : MonoBehaviour
         if (!movementLocked && !ignoreInput)
         {
             ApplyMovement();
-        } else if (movementLocked)
+        }
+        else if (movementLocked && !isIce)
         {
             body.linearVelocity = Vector2.zero;
         }
+        else if (movementLocked && isIce) 
+        {
+            float iceAccel = -1f;        // How quickly we approach target speed
+            float iceDrag = 0.98f;      // How much we preserve momentum
+
+            float desiredVelocityX = 0f;
+
+            // Smooth velocity change on ice
+            float newVelocityX = Mathf.Lerp(body.linearVelocity.x, desiredVelocityX, Time.fixedDeltaTime * iceAccel);
+
+            // Preserve some of the previous velocity (simulate sliding)
+            newVelocityX *= iceDrag;
+
+            body.linearVelocity = new Vector2(newVelocityX, body.linearVelocity.y);
+
+        }
+
         CheckSurroundings();
     }
 
     private void CheckSurroundings()
     {
         bool wasGrounded = isGrounded;
-        bool touchedWall = isWall;
+        bool touchedWall = isWall1 || isWall2;
 
+        // detect if grounded / if on ice/ if hit wall
         isGrounded = Physics2D.BoxCast(groundCheck.position, boxSize, 0, -transform.up, castDistance, whatIsGround | whatIsIce);
         isIce = Physics2D.BoxCast(groundCheck.position, boxSize, 0, -transform.up, castDistance, whatIsIce);
-        //isGrounded = Physics2D.OverlapCircle(groundCheck.position, groundCheckRadius, whatIsGround);
-        isWall = Physics2D.OverlapCircle(wallCheck.position, wallCheckRadius, whatIsGround);
+        isWall1 = Physics2D.OverlapCircle(wallCheck1.position, wallCheckRadius, whatIsGround | whatIsIce);
+        isWall2 = Physics2D.OverlapCircle(wallCheck2.position, wallCheckRadius, whatIsGround | whatIsIce);
+
 
 
         if (isGrounded) {
@@ -113,21 +135,12 @@ public class PlayerController : MonoBehaviour
         if (!ignoreInput)
         {
             movementInputDirection = Input.GetAxisRaw("Horizontal");
-            if (movementInputDirection < 0)
-            {
-                bounceDir = 1;
-            }
-            else if (movementInputDirection > 0)
-            {
-                bounceDir = -1;
-            }
+            bounceDir = body.linearVelocityX > 0 ? -1 : 1;
         }
         else 
         {
             movementInputDirection = 1.0f;
         }
-
-
 
         if (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.UpArrow))
             lastJumpInputTime = Time.time; // Buffer jump input
@@ -150,10 +163,11 @@ public class PlayerController : MonoBehaviour
             movementLocked = false;
         }
         // bounce off wall collision
-        if (isWall && !isGrounded)
+        if ((isWall1 || isWall2) && !isGrounded)
         {
             ignoreInput = true;
             body.linearVelocity = new Vector2(bounceDir * (movementSpeed / 2), body.linearVelocity.y);
+            bounceDir *= -1;
         }
     }
 
@@ -216,5 +230,8 @@ public class PlayerController : MonoBehaviour
         //Gizmos.DrawWireSphere(groundCheck.position, groundCheckRadius);
         // makes raycast outline visible
         Gizmos.DrawWireCube(groundCheck.position-transform.up*castDistance, boxSize);
+        Gizmos.DrawWireSphere(wallCheck1.position, wallCheckRadius);
+        Gizmos.DrawWireSphere(wallCheck2.position, wallCheckRadius);
+
     }
 }
