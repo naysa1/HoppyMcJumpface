@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 8ac8afd0232354cbebf2dfdeaa3b2301
+guid: 52e481bb235084471bb4100b232255b2
 TrueTypeFontImporter:
   externalObjects: {}
   serializedVersion: 4
@@ -9,7 +9,7 @@ TrueTypeFontImporter:
   characterPadding: 1
   includeFontData: 1
   fontNames:
-  - Miskan
+  - Breathe Fire II
   fallbackFontReferences: []
   customCharacters: 
   fontRenderingMode: 0
