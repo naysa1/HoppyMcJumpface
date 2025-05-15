@@ -198,7 +198,7 @@ public class PlayerController : MonoBehaviour
         else if (isMud)
         {
 
-            float desiredVelocityX = movementInputDirection * movementSpeed * 1.25f;
+            float desiredVelocityX = movementInputDirection * movementSpeed * 0.75f;
 
             // Smooth velocity change on mud
             float newVelocityX = Mathf.Lerp(body.linearVelocity.x, desiredVelocityX, Time.fixedDeltaTime * mudAccel);
