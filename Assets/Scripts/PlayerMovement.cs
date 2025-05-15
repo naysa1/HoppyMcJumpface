@@ -23,7 +23,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float iceAccel = 2f;
     [SerializeField] private float iceDrag = 1f;
 
-    [SerializeField] private float mudAccel = 6f;
+    [SerializeField] private float mudAccel = 5f;
     [SerializeField] private float mudDrag = .8f;
 
     [Header("Jump Settings")]
@@ -90,7 +90,7 @@ public class PlayerController : MonoBehaviour
         isGrounded = Physics2D.BoxCast(groundCheck.position, boxSize, 0, -transform.up, castDistance, whatIsGround | whatIsIce | whatIsMud);
         isIce = Physics2D.BoxCast(groundCheck.position, boxSize, 0, -transform.up, castDistance, whatIsIce);
         isMud = Physics2D.BoxCast(groundCheck.position, boxSize, 0, -transform.up, castDistance, whatIsMud);
-        isWall = Physics2D.OverlapCircle(wallCheck.position, wallCheckRadius, whatIsGround);
+        isWall = Physics2D.OverlapCircle(wallCheck.position, wallCheckRadius, whatIsGround | whatIsIce | whatIsMud);
 
 
         if (isGrounded) {
@@ -140,12 +140,19 @@ public class PlayerController : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.UpArrow))
             lastJumpInputTime = Time.time; // Buffer jump input
 
-        if ((Input.GetKey(KeyCode.Space) || Input.GetKey(KeyCode.UpArrow)) && /*canJump*/ isGrounded)
+        if ((Input.GetKey(KeyCode.Space) || Input.GetKey(KeyCode.UpArrow)) && /*canJump*/ isGrounded && isMud)
         {
             isChargingJump = true;
             movementLocked = true;
             jumpCharge += jumpChargeRate * Time.deltaTime;
             jumpCharge = Mathf.Clamp(jumpCharge, 5f, maxJumpValue);
+        }
+        else if ((Input.GetKey(KeyCode.Space) || Input.GetKey(KeyCode.UpArrow)) && /*canJump*/ isGrounded)
+        {
+            isChargingJump = true;
+            movementLocked = true;
+            jumpCharge += jumpChargeRate/2 * Time.deltaTime;
+            jumpCharge = Mathf.Clamp(jumpCharge, 5f, maxJumpValue - 5);
         }
 
         if (isChargingJump && (Input.GetKeyUp(KeyCode.Space) || Input.GetKeyUp(KeyCode.UpArrow)))
