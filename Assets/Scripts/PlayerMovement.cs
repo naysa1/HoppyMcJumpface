@@ -20,6 +20,12 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float deceleration = 8f;
     [SerializeField] private float airControlFactor = 0.75f;
 
+    [SerializeField] private float iceAccel = 2f;
+    [SerializeField] private float iceDrag = 1f;
+
+    [SerializeField] private float mudAccel = 6f;
+    [SerializeField] private float mudDrag = .8f;
+
     [Header("Jump Settings")]
     [SerializeField] private float jumpForce = 16.0f;
     [SerializeField] private float maxJumpValue = 20f;
@@ -34,6 +40,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float groundCheckRadius = 0.2f;
     [SerializeField] private LayerMask whatIsGround;
     [SerializeField] private LayerMask whatIsIce;
+    [SerializeField] private LayerMask whatIsMud;
 
     [Header("Wall Detection")]
     [SerializeField] private Transform wallCheck;
@@ -45,6 +52,7 @@ public class PlayerController : MonoBehaviour
     public bool isGrounded;
     public bool isIce;
     public bool isWall;
+    public bool isMud;
     public bool canJump;
 
     void Start()
@@ -79,9 +87,9 @@ public class PlayerController : MonoBehaviour
         bool wasGrounded = isGrounded;
         bool touchedWall = isWall;
 
-        isGrounded = Physics2D.BoxCast(groundCheck.position, boxSize, 0, -transform.up, castDistance, whatIsGround | whatIsIce);
+        isGrounded = Physics2D.BoxCast(groundCheck.position, boxSize, 0, -transform.up, castDistance, whatIsGround | whatIsIce | whatIsMud);
         isIce = Physics2D.BoxCast(groundCheck.position, boxSize, 0, -transform.up, castDistance, whatIsIce);
-        //isGrounded = Physics2D.OverlapCircle(groundCheck.position, groundCheckRadius, whatIsGround);
+        isMud = Physics2D.BoxCast(groundCheck.position, boxSize, 0, -transform.up, castDistance, whatIsMud);
         isWall = Physics2D.OverlapCircle(wallCheck.position, wallCheckRadius, whatIsGround);
 
 
@@ -175,8 +183,6 @@ public class PlayerController : MonoBehaviour
         
          if (isIce)
         {
-            float iceAccel = 2f;        // How quickly we approach target speed
-            float iceDrag = 1f;      // How much we preserve momentum
 
             float desiredVelocityX = movementInputDirection * movementSpeed * 1.25f;
 
@@ -185,6 +191,20 @@ public class PlayerController : MonoBehaviour
 
             // Preserve some of the previous velocity (simulate sliding)
             newVelocityX *= iceDrag;
+
+            body.linearVelocity = new Vector2(newVelocityX, body.linearVelocity.y);
+        } 
+        
+        else if (isMud)
+        {
+
+            float desiredVelocityX = movementInputDirection * movementSpeed * 1.25f;
+
+            // Smooth velocity change on mud
+            float newVelocityX = Mathf.Lerp(body.linearVelocity.x, desiredVelocityX, Time.fixedDeltaTime * mudAccel);
+
+            // Preserve some of the previous velocity (simulate sliding)
+            newVelocityX *= mudDrag;
 
             body.linearVelocity = new Vector2(newVelocityX, body.linearVelocity.y);
         }
@@ -216,5 +236,6 @@ public class PlayerController : MonoBehaviour
         //Gizmos.DrawWireSphere(groundCheck.position, groundCheckRadius);
         // makes raycast outline visible
         Gizmos.DrawWireCube(groundCheck.position-transform.up*castDistance, boxSize);
+        Gizmos.DrawWireSphere(wallCheck.position * castDistance, wallCheckRadius);
     }
 }
