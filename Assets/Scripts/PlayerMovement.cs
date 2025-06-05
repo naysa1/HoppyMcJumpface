@@ -16,9 +16,9 @@ public class PlayerController : MonoBehaviour
 
     [Header("Movement Settings")]
     [SerializeField] private float movementSpeed = 10.0f;
-    [SerializeField] private float acceleration = 8f;
-    [SerializeField] private float deceleration = 8f;
-    [SerializeField] private float airControlFactor = 0.75f;
+    // [SerializeField] private float acceleration = 8f;
+    // [SerializeField] private float deceleration = 8f;
+    // [SerializeField] private float airControlFactor = 0.75f;
 
     [SerializeField] private float iceAccel = 2f;
     [SerializeField] private float iceDrag = 1f;
@@ -27,7 +27,6 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float mudDrag = .8f;
 
     [Header("Jump Settings")]
-    [SerializeField] private float jumpForce = 16.0f;
     [SerializeField] private float maxJumpValue = 20f;
     [SerializeField] private float jumpChargeRate = 40f;
     [SerializeField] private float coyoteTime = 0.2f;
@@ -37,7 +36,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private Transform groundCheck;
     [SerializeField] private Vector2 boxSize;
     [SerializeField] private float castDistance;
-    [SerializeField] private float groundCheckRadius = 0.2f;
+
     [SerializeField] private LayerMask whatIsGround;
     [SerializeField] private LayerMask whatIsIce;
     [SerializeField] private LayerMask whatIsMud;
@@ -152,6 +151,7 @@ public class PlayerController : MonoBehaviour
         {
             if (Time.time - lastGroundedTime <= coyoteTime || Time.time - lastJumpInputTime <= jumpBufferTime)
                 body.linearVelocity = new Vector2(body.linearVelocity.x, jumpCharge);
+                SFXManager.Play("Jump");
 
             jumpCharge = 5f;
             isChargingJump = false;
